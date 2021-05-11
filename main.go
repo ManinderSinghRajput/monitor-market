@@ -1,12 +1,10 @@
 package main
 
 import (
+	"github.com/ManinderSinghRajput/monitor-market/pkg/config"
 	"io/ioutil"
 	"log"
 	"sync"
-	"time"
-
-	"github.com/ManinderSinghRajput/monitor-market/pkg/config"
 )
 
 func main() {
@@ -23,11 +21,12 @@ func main() {
 
 	var wg sync.WaitGroup
 	wg.Add(len(ci.CurrencyInfo))
-	for _, v := range ci.CurrencyInfo{
-		//go v.MonitorFromApi(ci.APIKey, &wg)
-		go v.MonitorFromWeb(&wg)
+	go ci.MonitorFromApi(&wg)
+	/*for _, v := range ci.CurrencyInfo{
+		go v.MonitorFromApi(ci.APIKey, &wg)
+		//go v.MonitorFromWeb(&wg)
 		time.Sleep(1*time.Second)
-	}
+	}*/
 	wg.Wait()
 	//ci.CurrencyInfo[0].MonitorFromWeb("https://www.coindesk.com/price/bitcoin")
 }

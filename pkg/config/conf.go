@@ -24,6 +24,8 @@ func (r *CurrencyInfo) Marshal() ([]byte, error) {
 
 type CurrencyInfo struct {
 	APIKey       string                `json:"apiKey"`
+	Currencies   string                `json:"currencies"`
+	ToCurrency   string                `json:"toCurrency"`
 	CurrencyInfo []CurrencyInfoElement `json:"currencyInfo"`
 }
 
@@ -31,7 +33,29 @@ type CurrencyInfoElement struct {
 	FromCurrency string `json:"fromCurrency"`
 	UpperLimit   string `json:"upperLimit"`
 	LowerLimit   string `json:"lowerLimit"`
-	ToCurrency   string `json:"toCurrency"`
+}
+
+type APIResponse []APIResponseElement
+
+func UnmarshalAPIResponse(data []byte) (APIResponse, error) {
+	var r APIResponse
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *APIResponse) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+func (r *APIResponse) MarshalIndent() ([]byte, error) {
+	return json.MarshalIndent(r, "", " ")
+}
+
+type APIResponseElement struct {
+	Symbol   string `json:"symbol"`
+	Name     string `json:"name"`
+	Price    string `json:"price"`
+	Timestamp string `json:"price_timestamp"`
 }
 
 func UnmarshalResponse(data []byte) (Response, error) {
@@ -55,11 +79,10 @@ type CurrentExchangeRate struct {
 	PriceCurrency string  `json:"priceCurrency"`
 }
 
-func (r *CurrencyInfoElement) MonitorFromApi(apiKey string, wg *sync.WaitGroup) {
+func (r *CurrencyInfo) MonitorFromApi(wg *sync.WaitGroup) {
 	defer wg.Done()
-	url := fmt.Sprintf("https://www.alphavantage.co/query?"+
-		"function=CURRENCY_EXCHANGE_RATE&from_currency=%s&"+
-		"to_currency=%s&apikey=%s", strings.ToUpper(r.FromCurrency), r.ToCurrency, apiKey)
+
+	url := fmt.Sprintf("https://api.nomics.com/v1/currencies/ticker?key=%s&ids=%s&interval=1d&convert=%s", r.APIKey, strings.ToUpper(r.Currencies), r.ToCurrency)
 
 	for {
 		req, err := http.NewRequest("GET", url, nil)
@@ -84,7 +107,19 @@ func (r *CurrencyInfoElement) MonitorFromApi(apiKey string, wg *sync.WaitGroup) 
 			log.Println(err.Error())
 			break
 		}
-		fmt.Println(string(body))
+		response,  err := UnmarshalAPIResponse(body)
+		if err != nil {
+			log.Println(err.Error())
+			break
+		}
+		b, err := response.MarshalIndent()
+		if err != nil {
+			log.Println(err.Error())
+			break
+		}
+		fmt.Println(string(b))
+		//fmt.Println(string(body))
+		time.Sleep(1*time.Minute)
 	}
 	return
 }
@@ -124,5 +159,4 @@ func (r *CurrencyInfoElement) MonitorFromWeb(wg *sync.WaitGroup) {
 		fmt.Println(time.Now(), ": ",response)
 		time.Sleep(10 * time.Second)
 	}
-	return
 }

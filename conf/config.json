@@ -1,17 +1,17 @@
 {
-  "apiKey" : "9KV7D9IYCKPUWBYA",
+  "apiKey" : "",
+  "currencies": "btc,doge",
+  "toCurrency" : "USD",
   "currencyInfo": [
     {
       "fromCurrency": "btc",
       "upperLimit": "60000",
-      "lowerLimit": "50000",
-      "toCurrency": "USD"
+      "lowerLimit": "50000"
     },
     {
       "fromCurrency": "doge",
       "upperLimit": "1",
-      "lowerLimit": "0.3",
-      "toCurrency": "USD"
+      "lowerLimit": "0.3"
     }
   ]
 }
