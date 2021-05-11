@@ -1,7 +1,7 @@
 {
-  "apiKey" : "",
+  "apiKey" : "47b89eccda9cf4132aa8c09d7ad956956b2012b2",
   "currencies": "btc,doge",
-  "toCurrency" : "USD",
+  "toCurrency" : "INR",
   "currencyInfo": [
     {
       "fromCurrency": "btc",

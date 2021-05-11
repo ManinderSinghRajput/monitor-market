@@ -35,6 +35,8 @@ type CurrencyInfoElement struct {
 	LowerLimit   string `json:"lowerLimit"`
 }
 
+
+
 type APIResponse []APIResponseElement
 
 func UnmarshalAPIResponse(data []byte) (APIResponse, error) {
@@ -57,6 +59,8 @@ type APIResponseElement struct {
 	Price    string `json:"price"`
 	Timestamp string `json:"price_timestamp"`
 }
+
+
 
 func UnmarshalResponse(data []byte) (Response, error) {
 	var r Response
@@ -82,14 +86,15 @@ type CurrentExchangeRate struct {
 func (r *CurrencyInfo) MonitorFromApi(wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	url := fmt.Sprintf("https://api.nomics.com/v1/currencies/ticker?key=%s&ids=%s&interval=1d&convert=%s", r.APIKey, strings.ToUpper(r.Currencies), r.ToCurrency)
+	url := fmt.Sprintf("https://api.nomics.com/v1/currencies/ticker?key=%s&ids=%s&interval=1d&convert=%s", r.APIKey, strings.ToUpper(r.Currencies), strings.ToUpper(r.ToCurrency))
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
 
 	for {
-		req, err := http.NewRequest("GET", url, nil)
-		if err != nil {
-			log.Println(err.Error())
-			break
-		}
 
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
